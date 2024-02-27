@@ -9,22 +9,31 @@ import {
 } from '../redux/user/userSlice';
 import OauthButton from '../components/Oauth-button';
 
+/**
+ * Sign-in component for users to authenticate.
+ */
 export default function SignIn() {
+  // Local state to manage form data
   const [formData, setFormData] = useState({});
+
+  // Redux state and dispatch
   const { loading, error: errorMessage } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // Update form data on input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       dispatch(signInStart());
 
+      // Make POST request to sign in endpoint
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -37,6 +46,7 @@ export default function SignIn() {
       }
 
       if (res.ok) {
+        // Dispatch sign-in success action and navigate to home
         dispatch(signInSuccess(data));
         navigate('/');
       }
