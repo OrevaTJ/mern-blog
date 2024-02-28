@@ -47,7 +47,7 @@ export const signin = async (req, res, next) => {
 };
 
 export const googleAuth = async (req, res, next) => {
-  const { name, email, photoUrl } = req.body;
+  const { name, email, profilePhoto } = req.body;
 
   try {
     // Check if the user with the provided email already exists in the database
@@ -65,7 +65,7 @@ export const googleAuth = async (req, res, next) => {
         username,
         email,
         password: hashPassword,
-        profilePhoto: photoUrl,
+        profilePhoto
       });
       await user.save();
     }
