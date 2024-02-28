@@ -39,7 +39,7 @@ export const signin = async (req, res, next) => {
 
     res
       .status(200)
-      .cookie('blog_token', token, { httpOnly: true })
+      .cookie('user_token', token, { httpOnly: true })
       .json(otherUserDetails);
   } catch (error) {
     next(error);
