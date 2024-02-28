@@ -44,3 +44,18 @@ export const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteUser = async (req, res, next) => {
+  if (req.user.id !== req.params.id)
+    return next(errorHandler(401, 'Not authorized'));
+
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res
+      .clearCookie('user_token', { httpOnly: true })
+      .status(200)
+      .json('Account deleted successfully');
+  } catch (error) {
+    next(error);
+  }
+};
