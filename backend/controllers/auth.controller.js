@@ -32,7 +32,7 @@ export const signin = async (req, res, next) => {
       return next(errorHandler(400, 'Email or Password incorrect'));
     }
 
-    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: validUser._id, isAdmin: validUser.isAdmin }, process.env.JWT_SECRET);
 
     // remove password from response to client
     const { password: removePassword, ...otherUserDetails } = validUser._doc;
@@ -69,7 +69,7 @@ export const googleAuth = async (req, res, next) => {
       });
       await user.save();
     }
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET);
 
     const { password: removePassword, ...otherUserDetails } = user._doc;
 
