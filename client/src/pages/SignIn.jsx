@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Alert, Button, Label, Spinner, TextInput } from 'flowbite-react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  signInStart,
   signInError,
+  signInStart,
   signInSuccess,
 } from '../redux/user/userSlice';
 import OauthButton from '../components/Oauth-button';
@@ -17,7 +17,7 @@ export default function SignIn() {
   const [formData, setFormData] = useState({});
 
   // Redux state and dispatch
-  const { loading, error: errorMessage } = useSelector((state) => state.user);
+  const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -29,10 +29,9 @@ export default function SignIn() {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(signInStart());
 
     try {
-      dispatch(signInStart());
-
       // Make POST request to sign in endpoint
       const res = await fetch('/api/auth/signin', {
         method: 'POST',
@@ -114,9 +113,9 @@ export default function SignIn() {
               Sign Up
             </Link>
           </div>
-          {errorMessage && (
+          {error && (
             <Alert className="mt-5" color="failure">
-              {errorMessage}
+              {error}
             </Alert>
           )}
         </div>

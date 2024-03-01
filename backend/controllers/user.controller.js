@@ -22,7 +22,7 @@ export const updateUser = async (req, res, next) => {
 
     const updateObject = {
       $set: {
-        username: username.split(' ').join('').toLowerCase(),
+        username,
         email,
         password: hashedPassword,
         profilePhoto,
@@ -55,6 +55,17 @@ export const deleteUser = async (req, res, next) => {
       .clearCookie('user_token', { httpOnly: true })
       .status(200)
       .json('Account deleted successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const signout = (req, res, next) => {
+  try {
+    res
+      .clearCookie('user_token', { httpOnly: true })
+      .status(200)
+      .json('Signed out successfully');
   } catch (error) {
     next(error);
   }
