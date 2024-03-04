@@ -15,23 +15,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { app } from '../../firebase';
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
 import { SignOut } from '../../utils/authUtils';
+import { useImageUpload } from '../../utils/imageUtils';
 
 export default function DashboardProfile() {
   const imageFileRef = useRef(null);
   const [imageFile, setImageFile] = useState(null);
-  const [imageFileUrl, setImageFileUrl] = useState(null);
-  const [imageUploadPercent, setImageUploadPercent] = useState(null);
-  const [isImageUploading, setIsImageUploading] = useState(false); // prevent multiple upload
-  const [imageUploadError, setImageUploadError] = useState(null);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -39,57 +29,37 @@ export default function DashboardProfile() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Image upload state and functionality
+  const {
+    handleImageFileUpload,
+    imageUploadPercent,
+    isImageUploading,
+    imageUploadError,
+  } = useImageUpload();
+  const [imageFileUrl, setImageFileUrl] = useState(null);
+
   const handleImageChange = (e) => {
     const image = e.target.files[0];
     if (image) {
       setImageFile(image);
-      setImageFileUrl(URL.createObjectURL(image));
+      setImageFileUrl(URL.createObjectURL(image)); // show temporary before getting profile photo from db
     }
   };
-  console.log(imageFileUrl)
 
   useEffect(() => {
     if (imageFile) {
-      handleImageFileUpload(imageFile);
+      handleImageFileUpload(imageFile)
+        .then((downloadUrl) => {
+          setImageFileUrl(downloadUrl);
+          setFormData({ ...formData, profilePhoto: downloadUrl });
+        })
+        .catch((error) => {
+          console.error('Error uploading image:', error);
+          setImageFile(null);
+          setImageFileUrl(null);
+        });
     }
   }, [imageFile]);
-
-  const handleImageFileUpload = async (file) => {
-    if (isImageUploading) return;
-
-    setIsImageUploading(true);
-    setImageUploadError(null);
-
-    const storage = getStorage(app);
-    const fileName = new Date().getTime() + file.name;
-    const storageRef = ref(storage, fileName);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    try {
-      uploadTask.on('state_changed', (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setImageUploadPercent(Math.round(progress));
-      });
-
-      await uploadTask;
-
-      const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
-      setImageFileUrl(downloadUrl);
-      setFormData({ ...formData, profilePhoto: downloadUrl });
-
-      // Clear upload progress after successful upload
-      setImageUploadPercent(null);
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      setImageUploadPercent(null);
-      setImageFile(null);
-      setImageFileUrl(null);
-      setImageUploadError('Image upload failed. Please try again.');
-    } finally {
-      setIsImageUploading(false);
-    }
-  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -220,6 +190,17 @@ export default function DashboardProfile() {
         >
           {loading ? 'Loading...' : 'Update'}
         </Button>
+        {currentUser.isAdmin && (
+          <Link to="/create-post">
+            <Button
+              type="button"
+              gradientDuoTone="purpleToPink"
+              className="w-full"
+            >
+              Create a post
+            </Button>
+          </Link>
+        )}
       </form>
       <div className="text-red-500 flex justify-between mt-5">
         <span onClick={() => setShowModal(true)} className="cursor-pointer">
@@ -266,4 +247,3 @@ export default function DashboardProfile() {
     </div>
   );
 }
-
