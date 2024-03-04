@@ -7,7 +7,7 @@ export const create = async (req, res, next) => {
 
   try {
     // Check if user is an admin
-    if (isAdmin) {
+    if (!isAdmin) {
       return next(errorHandler(403, 'Not allowed'));
     }
 
