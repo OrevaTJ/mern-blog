@@ -1,5 +1,4 @@
-import { Alert, Button, Modal, TextInput } from 'flowbite-react';
-import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import { Alert, Button, TextInput } from 'flowbite-react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
@@ -18,13 +17,17 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { SignOut } from '../../utils/authUtils';
 import { useImageUpload } from '../../utils/imageUtils';
+import { DeleteModal } from '../../utils/modalUtils';
 
 export default function DashboardProfile() {
+  // Ref for image input
   const imageFileRef = useRef(null);
-  const [imageFile, setImageFile] = useState(null);
+
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
+  // Redux state
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -37,7 +40,9 @@ export default function DashboardProfile() {
     imageUploadError,
   } = useImageUpload();
   const [imageFileUrl, setImageFileUrl] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
 
+  // Handler for image change
   const handleImageChange = (e) => {
     const image = e.target.files[0];
     if (image) {
@@ -46,6 +51,7 @@ export default function DashboardProfile() {
     }
   };
 
+  // Effect for handling image upload
   useEffect(() => {
     if (imageFile) {
       handleImageFileUpload(imageFile)
@@ -61,10 +67,12 @@ export default function DashboardProfile() {
     }
   }, [imageFile]);
 
+  // Handler for form field change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
+  // Handler for form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUpdateSuccess(null);
@@ -96,6 +104,7 @@ export default function DashboardProfile() {
     }
   };
 
+  // Handler for deleting user account
   const handleDelete = async () => {
     setShowModal(false);
     deleteUserStart();
@@ -220,30 +229,11 @@ export default function DashboardProfile() {
           {error}
         </Alert>
       )}
-      <Modal
-        show={showModal}
-        onClose={() => setShowModal(false)}
-        popup
-        size="md"
-      >
-        <Modal.Header />
-        <Modal.Body>
-          <div className="text-center">
-            <HiOutlineExclamationCircle className="h-14 w-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto" />
-            <h3 className="mb-5 text-lg text-gray-500 dark:text-gray-400">
-              Are you sure you want to delete your account?
-            </h3>
-            <div className="flex justify-center gap-4">
-              <Button color="failure" onClick={handleDelete}>
-                Yes
-              </Button>
-              <Button color="gray" onClick={() => setShowModal(false)}>
-                No, cancel
-              </Button>
-            </div>
-          </div>
-        </Modal.Body>
-      </Modal>
+      <DeleteModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 }
