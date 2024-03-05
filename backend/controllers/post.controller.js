@@ -87,13 +87,40 @@ export const getPosts = async (req, res, next) => {
 };
 
 export const deletePost = async (req, res, next) => {
-    if (!req.user.isAdmin || req.user.id !== req.params.userId) {
-      return next(errorHandler(403, 'Not allowed'));
-    }
-    try {
-      await Post.findByIdAndDelete(req.params.postId);
-      res.status(200).json('Post deleted successfully');
-    } catch (error) {
-      next(error);
-    }
-  };
+  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+    return next(errorHandler(403, 'Not allowed'));
+  }
+  try {
+    await Post.findByIdAndDelete(req.params.postId);
+    res.status(200).json('Post deleted successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updatePost = async (req, res, next) => {
+  const { title, content, category, image } = req.body;
+  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+    return next(errorHandler(403, 'Not allowed'));
+  }
+  try {
+    const updatedPost = await Post.findByIdAndUpdate(
+      req.params.postId,
+      {
+        $set: {
+          title,
+          content,
+          category,
+          image,
+        },
+      },
+      {
+        new: true, // return updated document
+        runValidators: true, // enforce validation rules specified in the model's schema
+      }
+    );
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    next(error);
+  }
+};
