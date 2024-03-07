@@ -154,6 +154,7 @@ export default function DashboardPosts() {
         showModal={showModal}
         setShowModal={setShowModal}
         handleDelete={handleDeletePost}
+        whatToDelete='post'
       />
     </div>
   );
