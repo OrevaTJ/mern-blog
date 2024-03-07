@@ -233,6 +233,7 @@ export default function DashboardProfile() {
         showModal={showModal}
         setShowModal={setShowModal}
         handleDelete={handleDelete}
+        whatToDelete='account'
       />
     </div>
   );
