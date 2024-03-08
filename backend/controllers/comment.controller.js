@@ -98,7 +98,7 @@ export const deleteComment = async (req, res, next) => {
 
     if (comment.userId !== req.user.id && !req.user.isAdmin) {
       return next(
-        errorHandler(403, 'You are not allowed to delete this comment')
+        errorHandler(403, 'Cannot delete this comment')
       );
     }
     

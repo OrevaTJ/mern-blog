@@ -90,6 +90,7 @@ export const deletePost = async (req, res, next) => {
   if (!req.user.isAdmin || req.user.id !== req.params.userId) {
     return next(errorHandler(403, 'Not allowed'));
   }
+
   try {
     await Post.findByIdAndDelete(req.params.postId);
     res.status(200).json('Post deleted successfully');
@@ -100,9 +101,11 @@ export const deletePost = async (req, res, next) => {
 
 export const updatePost = async (req, res, next) => {
   const { title, content, category, image } = req.body;
+
   if (!req.user.isAdmin || req.user.id !== req.params.userId) {
     return next(errorHandler(403, 'Not allowed'));
   }
+  
   try {
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.postId,
