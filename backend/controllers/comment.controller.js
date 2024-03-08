@@ -1,4 +1,5 @@
 import Comment from '../models/comment.model.js';
+import { getLastMonthDate } from '../utils/date.js';
 
 export const create = async (req, res, next) => {
   try {
@@ -104,6 +105,43 @@ export const deleteComment = async (req, res, next) => {
     
     await Comment.findByIdAndDelete(req.params.commentId);
     res.status(200).json('Comment has been deleted');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAllComments = async (req, res, next) => {
+  const { sort } = req.query;
+
+  if (!req.user.isAdmin)
+  return next(errorHandler(403, 'Not allowed'));
+
+  try {
+    // Parse query parameters
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDirection = sort === 'desc' ? 1 : -1;
+
+    // Query the database
+    const comments = await Comment.find()
+      .sort({ createdAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
+
+    // Get total posts count
+    const totalComments = await Comment.countDocuments();
+
+    // Get last month's posts count
+    const lastMonthComments = await Comment.countDocuments({
+      createdAt: { $gte: getLastMonthDate() },
+    });
+
+    // Send response
+    res.status(200).json({
+      comments,
+      totalComments,
+      lastMonthComments,
+    });
   } catch (error) {
     next(error);
   }
