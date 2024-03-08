@@ -35,11 +35,13 @@ export default function UpdatePost() {
       try {
         const res = await fetch(`/api/post/?postId=${postId}`);
         const data = await res.json();
+
         if (!res.ok) {
           console.log(data.message);
           setPublishError(data.message);
           return;
         }
+
         if (res.ok) {
           setPublishError(null);
           setFormData(data.posts[0]); // Returns an array
@@ -85,7 +87,9 @@ export default function UpdatePost() {
           body: JSON.stringify(formData),
         }
       );
+
       const data = await res.json();
+      
       if (!res.ok) {
         setPublishError(data.message);
         return;
