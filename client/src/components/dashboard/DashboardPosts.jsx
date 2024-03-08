@@ -98,6 +98,7 @@ export default function DashboardPosts() {
                     {new Date(post.updatedAt).toLocaleDateString()}
                   </Table.Cell>
                   <Table.Cell>
+                    {/* To individual post page with the post slug */}
                     <Link to={`/post/${post.slug}`}>
                       <img
                         src={post.image}

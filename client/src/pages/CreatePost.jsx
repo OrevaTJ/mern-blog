@@ -37,7 +37,7 @@ export default function CreatePost() {
       });
   };
 
-  // Function to handle form submission
+  // Function to handle form/post submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isImageUploading) return;
