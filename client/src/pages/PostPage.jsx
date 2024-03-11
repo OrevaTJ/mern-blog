@@ -61,7 +61,7 @@ export default function PostPage() {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex w-full justify-center items-center min-h-screen">
         <Spinner size="xl" />
       </div>
     );
