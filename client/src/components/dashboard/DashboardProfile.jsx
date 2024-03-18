@@ -17,7 +17,7 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { SignOut } from '../../utils/authUtils';
 import { useImageUpload } from '../../utils/imageUtils';
-import { DeleteModal } from '../../utils/modalUtils';
+import { DeleteModal } from '../modalUtils';
 
 export default function DashboardProfile() {
   // Ref for image input

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import Comment from './Comment';
-import { DeleteModal } from '../utils/modalUtils';
+import { DeleteModal } from '../components/modalUtils';
 
 export default function CommentSection({ postId }) {
   const { currentUser } = useSelector((state) => state.user);
