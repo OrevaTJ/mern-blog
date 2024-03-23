@@ -86,9 +86,9 @@ export default function CreatePost() {
             }
           >
             <option value="">Select a category</option>
-            <option value="javascript">JavaScript</option>
-            <option value="reactjs">React.js</option>
-            <option value="nextjs">Next.js</option>
+            <option value="Remote Work">Remote Work</option>
+            <option value="Personal Development">Personal Development</option>
+            <option value="Health & Wellness">Health & Wellness</option>
           </Select>
         </div>
         <div className="flex gap-4 items-center justify-between border-4 border-teal-500 border-dotted p-3">
