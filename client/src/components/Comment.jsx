@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FaThumbsUp } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { Button, Textarea } from 'flowbite-react';
+import { httpGetSingleUser } from '../api-services/user';
 
 export default function Comment({ comment, onLike, onEdit, onDelete }) {
   const [user, setUser] = useState({});
@@ -13,20 +14,13 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
   const { currentUser } = useSelector((state) => state.user);
 
   // Effect hook to fetch user data of the comment
+  const getUser = useCallback(async () => {
+    setUser(await httpGetSingleUser(comment.userId));
+  }, [comment.userId]);
+
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const res = await fetch(`/api/user/${comment.userId}`);
-        const data = await res.json();
-        if (res.ok) {
-          setUser(data);
-        }
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
     getUser();
-  }, [comment]);
+  }, [comment, getUser]);
 
   // Function to handle edit action
   const handleEdit = () => {
@@ -34,7 +28,7 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
     setEditedContent(comment.content);
   };
 
-  // Function to save edited comment to db and call function to update 
+  // Function to save edited comment to db and call function to update
   // edited comment in the client
   const handleSave = async () => {
     try {
@@ -47,7 +41,7 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
           content: editedContent,
         }),
       });
-      const data = await res.json()
+      const data = await res.json();
 
       if (res.ok) {
         setIsEditing(false);
