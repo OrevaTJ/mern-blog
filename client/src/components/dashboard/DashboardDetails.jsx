@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
   HiAnnotation,
@@ -8,6 +8,7 @@ import {
 } from 'react-icons/hi';
 import { Button, Table } from 'flowbite-react';
 import { Link } from 'react-router-dom';
+import { httpGetUsers } from '../../api-services/user';
 
 export default function DashboardDetails() {
   const [users, setUsers] = useState([]);
@@ -22,21 +23,14 @@ export default function DashboardDetails() {
   const { currentUser } = useSelector((state) => state.user);
 
   // Effect to get users, posts, comments
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch('/api/user/?limit=5');
-        const data = await res.json();
-        if (res.ok) {
-          setUsers(data.users);
-          setTotalUsers(data.totalUsers);
-          setLastMonthUsers(data.lastMonthUsers);
-        }
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
+  const getUsers = useCallback(async () => {
+    const userData = await httpGetUsers({limit: 5});
+    setUsers(userData.users);
+    setTotalUsers(userData.totalUsers);
+    setLastMonthUsers(userData.lastMonthUsers);
+  }, []);
 
+  useEffect(() => {
     const fetchPosts = async () => {
       try {
         const res = await fetch('/api/post/?limit=5');
@@ -66,11 +60,11 @@ export default function DashboardDetails() {
     };
 
     if (currentUser.isAdmin) {
-      fetchUsers();
+      getUsers();
       fetchPosts();
       fetchComments();
     }
-  }, [currentUser]);
+  }, [currentUser, getUsers]);
 
   return (
     <div className="p-3 md:mx-auto">

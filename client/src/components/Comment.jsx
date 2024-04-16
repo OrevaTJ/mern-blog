@@ -14,13 +14,13 @@ export default function Comment({ comment, onLike, onEdit, onDelete }) {
   const { currentUser } = useSelector((state) => state.user);
 
   // Effect hook to fetch user data of the comment
-  const getUser = useCallback(async () => {
+  const getSingleUser = useCallback(async () => {
     setUser(await httpGetSingleUser(comment.userId));
   }, [comment.userId]);
 
   useEffect(() => {
-    getUser();
-  }, [comment, getUser]);
+    getSingleUser();
+  }, [comment, getSingleUser]);
 
   // Function to handle edit action
   const handleEdit = () => {

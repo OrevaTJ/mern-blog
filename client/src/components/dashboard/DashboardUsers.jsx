@@ -1,8 +1,9 @@
 import { Table } from 'flowbite-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import { DeleteModal } from '../modalUtils';
+import { httpDeleteUser, httpGetUsers } from '../../api-services/user';
 
 export default function DashUsers() {
   const { currentUser } = useSelector((state) => state.user);
@@ -10,57 +11,44 @@ export default function DashUsers() {
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState('');
-  
+
+  // Function to fetch initial users data
+  const getUsers = useCallback(async () => {
+    const data = await httpGetUsers();
+
+    setUsers(data.users);
+
+    if (data.users.length < 9) {
+      setShowMore(false);
+    }
+  }, []);
+
+  // Effect hook to fetch users data when component mounts or currentUser.isAdmin changes
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch(`/api/user/`);
-        const data = await res.json();
-        if (res.ok) {
-          setUsers(data.users);
-          if (data.users.length < 9) {
-            setShowMore(false);
-          }
-        }
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
-    currentUser.isAdmin && fetchUsers();
-  }, [currentUser._id]);
+    currentUser.isAdmin && getUsers();
+  }, [currentUser._id, currentUser.isAdmin, getUsers]);
 
-  const handleShowMore = async () => {
-    const startIndex = users.length;
-    try {
-      const res = await fetch(`/api/user/?startIndex=${startIndex}`);
-      const data = await res.json();
-      if (res.ok) {
-        setUsers((prev) => [...prev, ...data.users]);
-        if (data.users.length < 9) {
-          setShowMore(false);
-        }
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+  // Function to fetch more users data
+  const handleShowMore = useCallback(async () => {
+    const data = await httpGetUsers({ startIndex: users.length });
 
-  const handleDeleteUser = async () => {
-    try {
-      const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
-        method: 'DELETE',
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
-        setShowModal(false);
-      } else {
-        console.log(data.message);
-      }
-    } catch (error) {
-      console.log(error.message);
+    // Update users state by appending newly fetched users data
+    setUsers((prev) => [...prev, ...data.users]);
+
+    if (data.users.length < 9) {
+      setShowMore(false);
     }
-  };
+  }, [users.length]);
+
+  // Function to handle user deletion
+  const handleDeleteUser = useCallback(async () => {
+    await httpDeleteUser(userIdToDelete);
+
+    setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
+
+    // Close modal after user deletion
+    setShowModal(false);
+  }, [userIdToDelete]);
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
@@ -124,7 +112,7 @@ export default function DashUsers() {
             showModal={showModal}
             setShowModal={setShowModal}
             handleDelete={handleDeleteUser}
-            whatToDelete='user'
+            whatToDelete="user"
           />
         </>
       ) : (

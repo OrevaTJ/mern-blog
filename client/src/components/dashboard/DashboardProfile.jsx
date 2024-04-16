@@ -3,6 +3,7 @@ import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
 import {
+  clearError,
   updateUserStart,
   updateUserSuccess,
   updateUserFailure,
@@ -11,16 +12,16 @@ import {
   deleteUserFailure,
 } from '../../redux/user/userSlice';
 import { useSelector, useDispatch } from 'react-redux';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useNavigate } from 'react-router-dom';
 import { SignOut } from '../../utils/authUtils';
 import { useImageUpload } from '../../utils/imageUtils';
 import { DeleteModal } from '../modalUtils';
+import { httpDeleteUser, httpUpdateUser } from '../../api-services/user';
 
 export default function DashboardProfile() {
-  // Ref for image input
   const imageFileRef = useRef(null);
 
   const [formData, setFormData] = useState({});
@@ -51,6 +52,11 @@ export default function DashboardProfile() {
     }
   };
 
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+  console.log(loading, isImageUploading);
+
   // Effect for handling image upload
   useEffect(() => {
     if (imageFile) {
@@ -65,7 +71,7 @@ export default function DashboardProfile() {
           setImageFileUrl(null);
         });
     }
-  }, [imageFile]);
+  }, [imageFile, formData, handleImageFileUpload]);
 
   // Handler for form field change
   const handleChange = (e) => {
@@ -81,16 +87,7 @@ export default function DashboardProfile() {
 
     try {
       dispatch(updateUserStart());
-
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
+      const data = await httpUpdateUser(currentUser._id, formData);
 
       if (data.success === false) {
         dispatch(updateUserFailure(data.message));
@@ -105,16 +102,12 @@ export default function DashboardProfile() {
   };
 
   // Handler for deleting user account
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     setShowModal(false);
     deleteUserStart();
 
     try {
-      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
-        method: 'DELETE',
-      });
-
-      const data = res.json();
+      const data = await httpDeleteUser(currentUser._id);
 
       if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
@@ -126,11 +119,12 @@ export default function DashboardProfile() {
     } catch (error) {
       deleteUserFailure(error.message);
     }
-  };
+  }, [currentUser._id, dispatch, navigate]);
 
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="file"
@@ -211,6 +205,7 @@ export default function DashboardProfile() {
           </Link>
         )}
       </form>
+
       <div className="text-red-500 flex justify-between mt-5">
         <span onClick={() => setShowModal(true)} className="cursor-pointer">
           Delete Account
@@ -219,21 +214,24 @@ export default function DashboardProfile() {
           Sign Out
         </span>
       </div>
+
       {updateSuccess && (
         <Alert color="success" className="mt-5">
           {updateSuccess}
         </Alert>
       )}
+
       {error && (
         <Alert color="failure" className="mt-5">
           {error}
         </Alert>
       )}
+
       <DeleteModal
         showModal={showModal}
         setShowModal={setShowModal}
         handleDelete={handleDelete}
-        whatToDelete='account'
+        whatToDelete="account"
       />
     </div>
   );
