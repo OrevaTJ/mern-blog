@@ -62,6 +62,7 @@ export const googleAuth = async (req, res, next) => {
 
       // Create and save the new user to the database
       user = new User({
+        name,
         username,
         email,
         password: hashPassword,
