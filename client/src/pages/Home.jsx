@@ -28,25 +28,28 @@ export default function Home() {
           className="h-52 md:h-[400px] flex align-middle my-4"
         >
           <div
-            className="flex items-center justify-center max-w-44 max-h-44 md:max-w-72 md:max-h-80 bg-white 
+            className="flex items-center justify-center max-w-44 max-h-28 md:max-w-72 md:max-h-40 bg-white 
             ml-7 md:ml-10 dark:bg-[rgb(16,23,42)]"
           >
             <div className="p-2">
               <h2 className="capitalize text-gray-400 text-sm">
                 featured article
               </h2>
-              <Link to={`/post/${posts[0].slug}`} className="font-bold text-xl md:text-3xl capitalize line-clamp-2">
+              <Link
+                to={`/post/${posts[0].slug}`}
+                className="font-semibold text-lg capitalize line-clamp-2"
+              >
                 {posts[0].title}
               </Link>
               <p className="text-xs text-gray-400 mt-1">
                 {fullNameDate(posts[0].createdAt)}
               </p>
-              <div
+              {/* <div
                 className="p-1 text-sm line-clamp-4 overflow-hidden"
                 dangerouslySetInnerHTML={{
                   __html: insertPTag(posts[0].content),
                 }}
-              />
+              /> */}
             </div>
           </div>
         </div>
@@ -64,7 +67,10 @@ export default function Home() {
                 key={post._id}
                 className="flex items-center gap-3 md:gap-8 mx-auto md:mx-40"
               >
-                <Link to={`/post/${post.slug}`} className="flex flex-1 justify-end">
+                <Link
+                  to={`/post/${post.slug}`}
+                  className="flex flex-1 justify-end"
+                >
                   <img
                     src={post.image}
                     alt="Image"
@@ -75,7 +81,10 @@ export default function Home() {
                   <h3 className="capitalize text-gray-400 text-sm">
                     {post.category}
                   </h3>
-                  <Link to={`/post/${post.slug}`} className="font-semibold text-xl md:text-2xl capitalize line-clamp-2">
+                  <Link
+                    to={`/post/${post.slug}`}
+                    className="font-semibold text-xl md:text-2xl capitalize line-clamp-2"
+                  >
                     {post.title}
                   </Link>
                   <p className="text-xs text-gray-400 mt-1">
@@ -118,7 +127,10 @@ export default function Home() {
               <h2 className="capitalize text-gray-400 text-sm">
                 {posts[4].category}
               </h2>
-              <Link to={`/post/${posts[4].slug}`} className="font-bold text-xl md:text-2xl capitalize line-clamp-1">
+              <Link
+                to={`/post/${posts[4].slug}`}
+                className="font-bold text-xl md:text-2xl capitalize line-clamp-1"
+              >
                 {posts[4].title}
               </Link>
               <p className="text-xs text-gray-400 mt-1">
@@ -155,7 +167,10 @@ export default function Home() {
                   <h3 className="capitalize text-gray-400 text-sm">
                     {post.category}
                   </h3>
-                  <Link to={`/post/${post.slug}`} className="font-semibold text-lg md:text-xl capitalize line-clamp-2">
+                  <Link
+                    to={`/post/${post.slug}`}
+                    className="font-semibold text-lg md:text-xl capitalize line-clamp-2"
+                  >
                     {post.title}
                   </Link>
                   <p className="text-xs text-gray-400 mt-1">
@@ -171,7 +186,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-
         </div>
       )}
     </div>
